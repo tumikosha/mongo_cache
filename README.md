@@ -9,7 +9,7 @@ Example:
 	import mongo_cache
 	
 	@mongo_cache(MONGO_URI, db_name="FB", collection="cache", ttl=datetime.timedelta(seconds=5))
-	def go(function_arg1, function_arg2, function_arg3):
+	def go(function_arg_as_MONGO_ID, function_arg2, function_arg3):
 		return 100
 
 	clear_cache(MONGO_URI, db_name="FB", collection="cache")
