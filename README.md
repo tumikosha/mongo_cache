@@ -4,6 +4,7 @@ Python module for caching function calls in mongoDB with TTL and  decorator
 First function parameter is used as a key
 
 Example:
+
 	import datetime
 	import mongo_cache
 	
