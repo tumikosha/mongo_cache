@@ -2,9 +2,10 @@
 """
 Python module for caching function calls in mongoDB with TTL and  decorator
 First function parameter is used as key
+Collection is zipped
 
 Example:
-	@mongo_cache(MONGO_URI, db_name="FB", collection="cache", ttl=datetime.timedelta(seconds=5))
+	@mongo_cache(MONGO_URI, db_name="FB", collection="cache", ttl=datetime.timedelta(seconds=5), verbose=False)
 	def go(function_arg1, function_arg2, function_arg3):
 		return 100
 
@@ -47,26 +48,7 @@ def ensure_index(xdb, collection, field, direction):
 		print(str(e))
 
 
-def ensure_indexes(xdb):
-	"""create index if it is not exists"""
-	print('[X] Ensure indexes')
-	try:
-		# response = xdb[collection].create_index([(field, direction)])
-		idx2 = db.people.create_index([('update_time', pymongo.DESCENDING)], name='update_time_index')
-		# idx4 = db.people.create_index([('text', pymongo.TEXT)], name='message_text', default_language='english')
-		idx5 = db.people.create_index([('add', pymongo.TEXT), \
-									   ('location', pymongo.TEXT), \
-									   ('name', pymongo.TEXT), \
-									   ('position', pymongo.TEXT), \
-									   ('country', pymongo.TEXT), \
-									   ('company_name', pymongo.TEXT) \
-									   ], name='people_index', default_language='english')
-
-	except Exception as e:
-		print(str(e))
-
-
-def prepare_database(MONGO_URI, DB_NAME):
+def prepare_database(mongo_uri, db_name):
 	""" singletone
 	makes database connection
 	:return: (client, database)
@@ -75,8 +57,8 @@ def prepare_database(MONGO_URI, DB_NAME):
 	if client is not None:
 		return client, db
 
-	client = pymongo.MongoClient(MONGO_URI)
-	db = client[DB_NAME]
+	client = pymongo.MongoClient(mongo_uri)
+	db = client[db_name]
 	create_zlib_collection(db, "users")
 	ensure_index(db, 'users', 'created_at', pymongo.ASCENDING)
 	return client, db
@@ -117,7 +99,6 @@ def mongo_cache(mongo_uri, db_name="cache", collection="cache", ttl="1 second ag
 	return decorator
 
 
-# @mongo_cache(MONGO_URI, db_name="FB", collection="cache", ttl="3 seconds ago")
 @mongo_cache(MONGO_URI, db_name="FB", collection="cache", ttl=datetime.timedelta(seconds=5), verbose=True)
 def go(function_arg1, function_arg2, function_arg3):
 	return 100
